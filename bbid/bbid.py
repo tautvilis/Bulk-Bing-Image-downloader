@@ -72,7 +72,7 @@ def download(pool_sema: threading.Semaphore, img_sema: threading.Semaphore, url:
             return
 
         if not detect_labels_local_file(image):
-            print('SKIP: Image doesnt contain a bird and a roof')
+            print('SKIP: Image doesnt contain a bird and a roof ' + url)
             return
         # Attach a file extension based on an image header
         ext = 'jpg' if imgtype == 'jpeg' else imgtype
