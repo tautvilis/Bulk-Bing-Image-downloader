@@ -122,11 +122,16 @@ def detect_labels_local_file(photo):
     result = 0
     for label in response['Labels']:
         # print (label['Name'] + ' : ' + str(label['Confidence']))
+        if result>=2:
+            break
         if label['Name'] == 'Bird' and label['Confidence'] > 80:
-          result+=1
-        if (label['Name'] == 'Housing' or label['Name'] == 'House' or label['Name']== 'Roof')and label['Confidence'] > 60:
-          result+=1
-          break
+            result+=1
+        if label['Name'] == 'Housing' and label['Confidence'] > 60:
+            result+=1
+        if label['Name'] == 'House' and label['Confidence'] > 60:
+            result+=1
+        if label['Name']== 'Roof' and label['Confidence'] > 60:
+            result+=1
 
     return True if result == 2 else False
 
