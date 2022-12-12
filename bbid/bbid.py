@@ -133,7 +133,7 @@ def detect_labels_local_file(photo):
         if label['Name']== 'Roof' and label['Confidence'] > 60:
             result+=1
 
-    return True if result == 2 else False
+    return True if result >= 2 else False
 
 def fetch_images_from_keyword(pool_sema: threading.Semaphore, img_sema: threading.Semaphore, keyword: str,
                               output_dir: str, filters: str, limit: int):
