@@ -70,11 +70,10 @@ def download(pool_sema: threading.Semaphore, img_sema: threading.Semaphore, url:
         if not imgtype:
             print('SKIP: Invalid image, not saving ' + name)
             return
-        
+
         if not detect_labels_local_file(image):
             print('SKIP: Image doesnt contain a bird and a roof')
             return
-
         # Attach a file extension based on an image header
         ext = 'jpg' if imgtype == 'jpeg' else imgtype
         filename = name + '.' + ext
@@ -102,6 +101,7 @@ def download(pool_sema: threading.Semaphore, img_sema: threading.Semaphore, url:
         imagefile = open(os.path.join(output_dir, filename), 'wb')
         imagefile.write(image)
         imagefile.close()
+
         print(" OK : " + filename)
         tried_urls.append(url)
     except Exception as e:
@@ -115,8 +115,8 @@ def download(pool_sema: threading.Semaphore, img_sema: threading.Semaphore, url:
 def detect_labels_local_file(photo):
     client=boto3.client('rekognition', region_name="eu-central-1")
    
-    with open(photo, 'rb') as image:
-        response = client.detect_labels(Image={'Bytes': photo})
+    
+    response = client.detect_labels(Image={'Bytes': photo})
         
     # print('Detected labels in ' + photo)    
     result = 0
@@ -153,6 +153,7 @@ def fetch_images_from_keyword(pool_sema: threading.Semaphore, img_sema: threadin
             for index, link in enumerate(links):
                 if limit is not None and len(tried_urls) >= limit:
                     exit(0)
+                time.sleep(1)
                 t = threading.Thread(target=download, args=(pool_sema, img_sema, link, output_dir, limit))
                 t.start()
                 current += 1
