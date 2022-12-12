@@ -12,6 +12,7 @@ import threading
 import time
 import urllib.parse
 import urllib.request
+import boto3
 from io import BytesIO
 
 
@@ -69,6 +70,10 @@ def download(pool_sema: threading.Semaphore, img_sema: threading.Semaphore, url:
         if not imgtype:
             print('SKIP: Invalid image, not saving ' + name)
             return
+        
+        if not detect_labels_local_file(BytesIO(image)):
+            print('SKIP: Image doesnt contain a bird and a roof')
+            return
 
         # Attach a file extension based on an image header
         ext = 'jpg' if imgtype == 'jpeg' else imgtype
@@ -107,6 +112,23 @@ def download(pool_sema: threading.Semaphore, img_sema: threading.Semaphore, url:
             img_sema.release()
         in_progress -= 1
 
+def detect_labels_local_file(photo):
+    client=boto3.client('rekognition', region_name="eu-central-1")
+   
+    with open(photo, 'rb') as image:
+        response = client.detect_labels(Image={'Bytes': photo})
+        
+    # print('Detected labels in ' + photo)    
+    result = 0
+    for label in response['Labels']:
+        # print (label['Name'] + ' : ' + str(label['Confidence']))
+        if label['Name'] == 'Bird' and label['Confidence'] > 80:
+          result+=1
+        if (label['Name'] == 'Housing' or label['Name'] == 'House' or label['Name']== 'Roof')and label['Confidence'] > 60:
+          result+=1
+          break
+
+    return True if result == 2 else False
 
 def fetch_images_from_keyword(pool_sema: threading.Semaphore, img_sema: threading.Semaphore, keyword: str,
                               output_dir: str, filters: str, limit: int):
