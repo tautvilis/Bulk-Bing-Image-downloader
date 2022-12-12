@@ -71,7 +71,7 @@ def download(pool_sema: threading.Semaphore, img_sema: threading.Semaphore, url:
             print('SKIP: Invalid image, not saving ' + name)
             return
         
-        if not detect_labels_local_file(BytesIO(image)):
+        if not detect_labels_local_file(image):
             print('SKIP: Image doesnt contain a bird and a roof')
             return
 
