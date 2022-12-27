@@ -117,23 +117,20 @@ def detect_labels_local_file(photo):
    
     
     response = client.detect_labels(Image={'Bytes': photo})
-        
-    # print('Detected labels in ' + photo)    
+    # print('Detected labels in ' +response)    
     result = 0
+    if(not any(label['Name']=='Bird' and label['Confidence'] > 80 for label in response['Labels'])):
+        return False
     for label in response['Labels']:
         # print (label['Name'] + ' : ' + str(label['Confidence']))
-        if result>=2:
-            break
-        if label['Name'] == 'Bird' and label['Confidence'] > 80:
-            result+=1
         if label['Name'] == 'Housing' and label['Confidence'] > 60:
-            result+=1
+            return True
         if label['Name'] == 'House' and label['Confidence'] > 60:
-            result+=1
-        if label['Name']== 'Roof' and label['Confidence'] > 60:
-            result+=1
+            return True
+        if label['Name']== 'Roof' and label['Confidence'] > 40:
+            return True
 
-    return True if result >= 2 else False
+    return False
 
 def fetch_images_from_keyword(pool_sema: threading.Semaphore, img_sema: threading.Semaphore, keyword: str,
                               output_dir: str, filters: str, limit: int):
